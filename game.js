@@ -73,6 +73,7 @@ function updateUI(msg = "") {
     div.onclick = () => playCard(index);
     if (waitingAi) div.classList.add("disabled");
     hand.appendChild(div);
+    currentStarter = "player";
   });
 
   el("trucoBtn").disabled = !gameActive || waitingAi || handValue >= 12;
@@ -100,13 +101,19 @@ function playCard(index) {
   if (!gameActive || waitingAi) return;
 
   playerPlayed = playerHand.splice(index, 1)[0];
-  aiPlayed = null;
-  waitingAi = true;
 
+  if (aiPlayed) {
+    updateUI(`Você jogou ${playerPlayed.rank}${playerPlayed.suit}. Comparando cartas...`);
+    setTimeout(() => {
+      resolveRound();
+    }, 900);
+    return;
+  }
+
+  waitingAi = true;
   updateUI(`Você jogou ${playerPlayed.rank}${playerPlayed.suit}. Aguardando a IA...`);
 
   setTimeout(() => {
-    if (!gameActive) return;
     aiPlayed = chooseAiCard();
     updateUI(`IA jogou ${aiPlayed.rank}${aiPlayed.suit}. Comparando cartas...`);
 
@@ -115,6 +122,7 @@ function playCard(index) {
       resolveRound();
     }, 900);
   }, 1300);
+}
 }
 
 function chooseAiCard() {
