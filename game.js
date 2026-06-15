@@ -127,15 +127,23 @@ function chooseAiCard() {
   }
   return aiHand.splice(selectedIndex, 1)[0];
 }
-
 function resolveRound() {
   let result;
+
   if (playerPlayed.power > aiPlayed.power) result = "player";
   else if (aiPlayed.power > playerPlayed.power) result = "ai";
   else result = "draw";
 
   roundWins.push(result);
-  let msg = result === "player" ? "Você ganhou a rodada." : result === "ai" ? "IA ganhou a rodada." : "Rodada empatou.";
+
+  let msg = result === "player"
+    ? "Você ganhou a rodada."
+    : result === "ai"
+    ? "IA ganhou a rodada."
+    : "Rodada empatou.";
+
+  if (result === "player") currentStarter = "player";
+  if (result === "ai") currentStarter = "ai";
 
   const handWinner = checkHandWinner();
   if (handWinner) return finishHand(handWinner, msg);
@@ -143,7 +151,22 @@ function resolveRound() {
   round++;
   playerPlayed = null;
   aiPlayed = null;
-  updateUI(`${msg} Agora escolha outra carta.`);
+
+  if (currentStarter === "ai") {
+    waitingAi = true;
+    updateUI(`${msg} IA começa a próxima rodada...`);
+
+    setTimeout(() => {
+      aiPlayed = chooseAiCard();
+      waitingAi = false;
+      updateUI(`IA jogou ${aiPlayed.rank}${aiPlayed.suit}. Agora escolha sua carta.`);
+    }, 1200);
+  } else {
+    updateUI(`${msg} Você começa a próxima rodada.`);
+  }
+}
+
+
 }
 function checkHandWinner() {
   // Se alguém ganhou a 1ª rodada e a 2ª empatou, a mão acaba
