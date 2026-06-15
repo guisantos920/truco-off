@@ -145,20 +145,32 @@ function resolveRound() {
   aiPlayed = null;
   updateUI(`${msg} Agora escolha outra carta.`);
 }
-
 function checkHandWinner() {
+  // Se alguém ganhou a 1ª rodada e a 2ª empatou, a mão acaba
+  if (roundWins.length === 2) {
+    if (roundWins[0] !== "draw" && roundWins[1] === "draw") {
+      return roundWins[0];
+    }
+  }
+
   const p = roundWins.filter(x => x === "player").length;
   const a = roundWins.filter(x => x === "ai").length;
+
   if (p >= 2) return "player";
   if (a >= 2) return "ai";
+
   if (roundWins.length === 3) {
     if (p > a) return "player";
     if (a > p) return "ai";
+
     const firstWinner = roundWins.find(x => x !== "draw");
     if (firstWinner) return firstWinner;
+
     return "none";
   }
+
   return null;
+
 }
 
 function finishHand(winner, prefix) {
